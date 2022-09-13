@@ -1,0 +1,321 @@
+{
+	"info": {
+		"_postman_id": "1d39859c-d166-4bc6-84a3-e4a3c6401bbe",
+		"name": "tugas",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "19379993"
+	},
+	"item": [
+		{
+			"name": "hari pertama",
+			"item": [
+				{
+					"name": "book",
+					"item": [
+						{
+							"name": "get all book",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{url_book}}/book",
+									"host": [
+										"{{url_book}}"
+									],
+									"path": [
+										"book"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "get book by id",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{url_book}}/book/1",
+									"host": [
+										"{{url_book}}"
+									],
+									"path": [
+										"book",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "create book",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"client_id\": 1234,\r\n  \"client_key\": \"CLIENT01\",\r\n  \"client_secret\": \"SECRET01\",\r\n  \"status\": true\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url_book}}/book",
+									"host": [
+										"{{url_book}}"
+									],
+									"path": [
+										"book"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "update book",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"id\": 1234,\r\n  \"title\": \"Judul Buku Satu\",\r\n  \"isbn\": \"1-234-5678-9101112-13\",\r\n  \"writer\": \"Dr. Who\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url_book}}/book/1",
+									"host": [
+										"{{url_book}}"
+									],
+									"path": [
+										"book",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "delete book",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{url_book}}/book/1",
+									"host": [
+										"{{url_book}}"
+									],
+									"path": [
+										"book",
+										"1"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "binance",
+					"item": [
+						{
+							"name": "get account",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"const ts  = Date.now();\r",
+											"pm.environment.set(\"timestamp\", ts);\r",
+											" \r",
+											"let paramsObject = {};\r",
+											" \r",
+											"const binance_api_secret = pm.environment.get(\"api_secret\");\r",
+											" \r",
+											"const parameters = pm.request.url.query;\r",
+											" \r",
+											"parameters.map((param) => {\r",
+											"    if (param.key != 'signature' && \r",
+											"        param.key != 'timestamp' && \r",
+											"        !is_empty(param.value) &&\r",
+											"        !is_disabled(param.disabled)) {\r",
+											"            paramsObject[param.key] = param.value;\r",
+											"            //console.log(encodeURIComponent(param.value));\r",
+											"            //pm.environment.set(param.key, encodeURIComponent(param.value));\r",
+											"    }\r",
+											"})\r",
+											"        \r",
+											"Object.assign(paramsObject, {'timestamp': ts});\r",
+											" \r",
+											"if (binance_api_secret) {\r",
+											"    const queryString = Object.keys(paramsObject).map((key) => {\r",
+											"        return `${key}=${paramsObject[key]}`;\r",
+											"    }).join('&');\r",
+											"    console.log(queryString);\r",
+											"    const signature = CryptoJS.HmacSHA256(queryString, binance_api_secret).toString();\r",
+											"    pm.environment.set(\"signature\", signature);\r",
+											"}\r",
+											" \r",
+											" \r",
+											"function is_disabled(str) {\r",
+											"    return str == true;\r",
+											"}\r",
+											" \r",
+											"function is_empty(str) {\r",
+											"    if (typeof str == 'undefined' ||\r",
+											"        !str || \r",
+											"        str.length === 0 || \r",
+											"        str === \"\" ||\r",
+											"        !/[^\\s]/.test(str) ||\r",
+											"        /^\\s*$/.test(str) ||\r",
+											"        str.replace(/\\s/g,\"\") === \"\")\r",
+											"    {\r",
+											"        return true;\r",
+											"    }\r",
+											"    else\r",
+											"    {\r",
+											"        return false;\r",
+											"    }\r",
+											"}"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "X-MBX-APIKEY",
+										"value": "{{api_key}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{url_binance}}/api/v3/account?timestamp={{timestamp}}&signature={{signature}}",
+									"host": [
+										"{{url_binance}}"
+									],
+									"path": [
+										"api",
+										"v3",
+										"account"
+									],
+									"query": [
+										{
+											"key": "timestamp",
+											"value": "{{timestamp}}"
+										},
+										{
+											"key": "signature",
+											"value": "{{signature}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "get btcusd 1min",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7HWJ2g7LO1UWp1J1WcIgyMysNO1knwSgYXAR0OI5sF30ky9zbrsdbUFYlsvPh1PM",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{url_binance}}/api/v1/klines?symbol=BTCUSDT&interval=1m&limit=1000",
+									"host": [
+										"{{url_binance}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"klines"
+									],
+									"query": [
+										{
+											"key": "symbol",
+											"value": "BTCUSDT"
+										},
+										{
+											"key": "interval",
+											"value": "1m"
+										},
+										{
+											"key": "limit",
+											"value": "1000"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "get btcusd 1day",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "7HWJ2g7LO1UWp1J1WcIgyMysNO1knwSgYXAR0OI5sF30ky9zbrsdbUFYlsvPh1PM",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{url_binance}}/api/v1/klines?symbol=BTCUSDT&interval=1d&startTime=1662045514000&endTime=1662563914000",
+									"host": [
+										"{{url_binance}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"klines"
+									],
+									"query": [
+										{
+											"key": "symbol",
+											"value": "BTCUSDT"
+										},
+										{
+											"key": "interval",
+											"value": "1d"
+										},
+										{
+											"key": "startTime",
+											"value": "1662045514000"
+										},
+										{
+											"key": "endTime",
+											"value": "1662563914000"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		}
+	]
+}
