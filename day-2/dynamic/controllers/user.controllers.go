@@ -18,13 +18,14 @@ type UserControllerInterface interface {
 	GetUserByIdControllers(c echo.Context) error
 	UpdateUserControllers(c echo.Context) error
 	DeletedUserControllers(c echo.Context) error
+	LoginUserControllers(c echo.Context) error
 }
 
-func Init(Lib database.UserContract) UserControllerInterface {
+func InitUser(Lib database.UserContract) UserControllerInterface {
 	return &UserControllers{Lib}
 }
 
-func (u UserControllers) CreateUserControllers(c echo.Context) error {
+func (u *UserControllers) CreateUserControllers(c echo.Context) error {
 	var data models.User
 
 	if err := c.Bind(&data); err != nil {
@@ -40,7 +41,7 @@ func (u UserControllers) CreateUserControllers(c echo.Context) error {
 	})
 }
 
-func (u UserControllers) GetUsersControllers(c echo.Context) error {
+func (u *UserControllers) GetUsersControllers(c echo.Context) error {
 	data, err := u.Lib.GetUsers()
 
 	if err != nil {
@@ -54,7 +55,7 @@ func (u UserControllers) GetUsersControllers(c echo.Context) error {
 	})
 }
 
-func (u UserControllers) GetUserByIdControllers(c echo.Context) error {
+func (u *UserControllers) GetUserByIdControllers(c echo.Context) error {
 	id := c.Param("id")
 	data, err := u.Lib.GetUserById(id)
 
@@ -69,7 +70,7 @@ func (u UserControllers) GetUserByIdControllers(c echo.Context) error {
 	})
 }
 
-func (u UserControllers) UpdateUserControllers(c echo.Context) error {
+func (u *UserControllers) UpdateUserControllers(c echo.Context) error {
 	id := c.Param("id")
 	var data models.User
 
@@ -79,7 +80,12 @@ func (u UserControllers) UpdateUserControllers(c echo.Context) error {
 		})
 	}
 
-	u.Lib.UpdateUser(id, data)
+	_, err := u.Lib.UpdateUser(id, data)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"msg": err.Error(),
+		})
+	}
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"msg": data,
@@ -98,5 +104,28 @@ func (u UserControllers) DeletedUserControllers(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"msg": "success delete user",
+	})
+}
+
+func (u UserControllers) LoginUserControllers(c echo.Context) error {
+	var user models.User
+
+	if err := c.Bind(&user); err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+			"msg": err.Error(),
+		})
+	}
+
+	users, err := u.Lib.LoginUser(user)
+
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"msg": err.Error(),
+		})
+	}
+
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"msg":   "Success Login",
+		"users": users,
 	})
 }

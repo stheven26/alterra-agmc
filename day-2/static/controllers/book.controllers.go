@@ -3,6 +3,7 @@ package controllers
 import (
 	"log"
 	"net/http"
+	"static/middleware"
 	"static/models"
 	"strconv"
 	"time"
@@ -108,5 +109,26 @@ func DeleteBook(c echo.Context) error {
 
 	return c.JSON(http.StatusBadRequest, map[string]interface{}{
 		"msg": "book not found",
+	})
+}
+
+func GenerateJWT(c echo.Context) error {
+	var id uint
+	for i := range books {
+		id = books[i].Id
+	}
+
+	convId := strconv.Itoa(int(id))
+
+	token, err := middleware.CreateToken(convId)
+
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, echo.Map{
+			"msg": err.Error(),
+		})
+	}
+
+	return c.JSON(http.StatusOK, echo.Map{
+		"token": token,
 	})
 }

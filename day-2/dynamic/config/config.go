@@ -9,7 +9,6 @@ import (
 	"github.com/joho/godotenv"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
 )
 
 var (
@@ -59,7 +58,7 @@ func InitDB() *gorm.DB {
 	dns := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=True&loc=Local", loadConfig["Username"], loadConfig["Password"], loadConfig["Host"], loadConfig["Port"], loadConfig["DB"])
 
 	db, err = gorm.Open(mysql.Open(dns), &gorm.Config{
-		Logger: logger.Default.LogMode(logger.Info),
+		// Logger: logger.Default.LogMode(logger.Info),
 	})
 
 	if err != nil {
@@ -71,4 +70,5 @@ func InitDB() *gorm.DB {
 
 func MigrateDB() {
 	db.AutoMigrate(&models.User{})
+	db.AutoMigrate(&models.Book{})
 }

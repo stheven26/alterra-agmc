@@ -1,11 +1,14 @@
 package main
 
 import (
+	m "static/middleware"
 	"static/routes"
 )
 
 func main() {
 	app := routes.App()
 
-	app.Start(":8080")
+	m.LogMiddleware(app)
+
+	app.Logger.Fatal(app.Start(":8080"))
 }
