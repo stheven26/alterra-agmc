@@ -17,7 +17,7 @@ var (
 
 func Init() *echo.Echo {
 	r := echo.New()
-
+	jwtMiddleware := middleware.JWT([]byte(config.LoadEnv().GetString("JWT_SECRET")))
 	userControllers := controllers.InitUser(LibUser)
 	bookControllers := controllers.InitBook(LibBook)
 
@@ -28,8 +28,7 @@ func Init() *echo.Echo {
 	r.GET("/books/:id", bookControllers.GetBookByIdControllers)
 
 	//need authorization
-	jwt := r.Group("/jwt")
-	jwt.Use(middleware.JWT([]byte(config.LoadEnv().GetString("JWT_KEY"))))
+	jwt := r.Group("/jwt", jwtMiddleware)
 	jwt.POST("/books", bookControllers.PostBookControllers)
 	jwt.GET("/users", userControllers.GetUsersControllers)
 	jwt.GET("/users/:id", userControllers.GetUserByIdControllers)
